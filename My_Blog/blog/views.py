@@ -15,20 +15,20 @@ class PostListView(ListView):
 def post_share(request, post_id):
     #retrieve post by id
     post = get_object_or_404(Post, id=post_id, status='published')
-    send = False
+    sent = False
 
     if request.method == 'POST':
         form = EmailPostForm(request.POST)                 #form is being submitted
         if form.is_valid():
             cd = form.cleaned_data                          #Form fields pass validation
             post_url = request.build_absolute_uri(post.get_absolute_url())
-            subject = f"{cd['name']} recommends you read" f"{post.title}"
+            subject = f"{cd['name']} recommends you read " f"{post.title}"
             message = f"Read {post.title} at {post_url}\n\n" f"{cd['name']}\'s comments: {cd['comments']}"
             send_mail(subject, message, 'admin@myblog.com', [cd['to']])
-            send = True                           
+            sent = True                           
     else:
         form = EmailPostForm()
-    return render(request, 'blog/post/share.html', {'post':post, 'form':form, 'send':sent})
+    return render(request, 'blog/post/share.html', {'post':post, 'form':form, 'sent':sent})
 
 
 def post_detail(request, year, month, day, post):
