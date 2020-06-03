@@ -1,12 +1,40 @@
 {% extends "blog/base.html" %}
 
-{% block title %}{{ post.title }}{% endblock %}
+{% block title %}{{ post.title }}{% endblock %}    
 
 {% block content %}
-    <h1>{{ post.title }}</h1>
-    <p class="date">
-        Published {{ post.publish }} by {{ post.author }}
-    </p>
-    {{ post.body|linebreaks }}
-    <p><a href="{% url "blog:post_share" post.id %}">Share this post</a></p>
+
+    <h1>{{ post.title }}</h1>                                                   <!--display Post title-->
+    <p class="date">Published {{ post.publish }} by {{ post.author }}</p>
+    {{ post.body|linebreaks }}                                                  <!--Display post body-->
+    <p><a href="{% url "blog:post_share" post.id %}">Share this post</a></p>    <!--share post by email link-->
+
+<!--with tag to add the total number of comments-->
+    {% with comments.count as total_comments %}
+            <h2>{{ total_comments }} comment{{ total_comments|pluralize }}</h2>
+    {% endwith %}
+
+<!--For loop to loop through the comments-->
+    {% for comment in comments %}
+            <div class="comment">
+                    <p class="info"> Comment {{ forloop.counter }} by {{comment.name}} {{ comment.created }}</p>    <!--display comment number and author of comment-->
+                    {{ comment.body|linebreaks }}                                           <!--display body of comment-->
+            </div>
+            {% empty %}                                                                     <!--if no comment exist, display what is in the paragraph-->
+                    <p>There are no comments yet.</p>
+    {% endfor %}
+
+    <!--if statement to submit new comment-->
+    {% if new_comment %}
+            <h2> Your comment has been added. </h2>
+    {% else %}
+            <h2> Add a new comment </h2>
+            <form method="post">
+                    {{ comment_form.as_p }}
+                    {% csrf_token %}
+                    <p><input type="submit" value="Add comment"></p>
+            </form>
+    {% endif %}
+
+    
 {% endblock %}
